@@ -1,0 +1,12 @@
+package com.bruno;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ParserEventsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ParserEventsApplication.class, args);
+    }
+}
