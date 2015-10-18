@@ -2,6 +2,7 @@ package com.bruno.parser;
 
 import java.io.IOException;
 
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,7 +17,8 @@ public class TestHtmlParser {
 	private static final String TIME = "div.prop.time";
 	private static final String WEBSITE = "div.prop.website";
 	private static final String PHONE = "div.prop.phone";
-	private static final String START_DATE = "div.prop.display_date";
+	private static final String DATE = "div.prop.display_date";
+	private static final String DESCRIPTION = "p.description";
 
 	public static void main(String[] args) {
 
@@ -24,20 +26,14 @@ public class TestHtmlParser {
 			int increments = 0;
 			int total = 100;
 
-			Document html = Jsoup
-					.connect(
-							"http://lincoln.org/?dstart=10%2F16%2F2015&os="
-									+ increments
-									+ "&cat=&dend=10%2F31%2F2015&keyword=")
-					.get();
+			Document html = Jsoup.connect("http://lincoln.org/?dstart=10%2F16%2F2015&os=" + increments + "&cat=&dend=10%2F31%2F2015&keyword=").get();
 
 			for (int i = 0; i < total; i++) {
 
 				if (increments < BARRIER) {
 
 					// get an event
-					Element singleEvent = html.select("div.info").get(
-							increments);
+					Element singleEvent = html.select("div.info").get(increments);
 
 					// select links from the selected event
 					Elements links = singleEvent.select("a");
@@ -51,11 +47,10 @@ public class TestHtmlParser {
 					System.out.println(event);
 
 					increments++;
+					
 				} else {
-					html = Jsoup.connect(
-							"http://lincoln.org/?dstart=10%2F16%2F2015&os=" + i
-									+ "&cat=&dend=10%2F31%2F2015&keyword=")
-							.get();
+					
+					html = Jsoup.connect("http://lincoln.org/?dstart=10%2F16%2F2015&os=" + i + "&cat=&dend=10%2F31%2F2015&keyword=").get();
 					increments = 0;
 				}
 
@@ -69,34 +64,48 @@ public class TestHtmlParser {
 	private static StringBuilder buildEvent(Element eventPage) {
 
 		StringBuilder sb = new StringBuilder();
-
+		
 		try {
-			Element startDate = eventPage.select(START_DATE).first();
-			sb.append(startDate.text());
+			Element description = eventPage.select(DESCRIPTION).first();
+			System.out.println(description.childNode(0));
+		} catch (NullPointerException e) {}
+		
+		try {
+			Element startDate = eventPage.select(DATE).first();
+			//sb.append(startDate.childNode(3).childNode(0));
+			System.out.println(startDate.childNode(3).childNode(0));
+			
 		} catch (NullPointerException e) {}
 		
 
 		try {
 			Element venue = eventPage.select(VENUE).first();
-			sb.append(venue.text());
+			//sb.append(venue.childNode(3).childNode(0));
+			System.out.println(venue.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 
 		try {
 			Element address = eventPage.select(ADDRESS).first();
-			sb.append(address.text());
+			//sb.append(address.text());
+			//sb.append(address.childNode(3).childNode(0));
+			System.out.println(address.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 
 		try {
 			Element cost = eventPage.select(PRICE).first();
-			sb.append(cost.text());
+			//sb.append(cost.text());
+			//sb.append(cost.childNode(3).childNode(0));
+			System.out.println(cost.childNode(3).childNode(0));
 		} catch (NullPointerException e) {
 		}
 
 		try {
 			Element time = eventPage.select(TIME).first();
-			sb.append(time.text());
+			//sb.append(time.text());
+			//sb.append(time.childNode(3).childNode(0));
+			System.out.println(time.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 
