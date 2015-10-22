@@ -45,7 +45,7 @@ public class TestHtmlParser {
 					Document eventPage = Jsoup.connect(link).get();
 
 					StringBuilder event = buildEvent(eventPage);
-					System.out.println(event);
+					System.out.println(TimeHelper.extractTime(event.toString()));
 
 					increments++;
 					
@@ -68,66 +68,60 @@ public class TestHtmlParser {
 		
 		try {
 			Element eventName = eventPage.select(EVENT_NAME).first();
-			System.out.println(eventName.childNodes().get(0));
+			//System.out.println(eventName.childNodes().get(0));
 			//sb.append(description.childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element description = eventPage.select(DESCRIPTION).first();
-			System.out.println(description.childNode(0));
-			//sb.append(description.childNode(0));
-		} catch (NullPointerException e) {}
-		
-		try {
-			Element description = eventPage.select(DESCRIPTION).first();
-			System.out.println(description.childNode(0));
+			//System.out.println(description.childNode(0));
 			//sb.append(description.childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element startDate = eventPage.select(DATE).first();
 			//sb.append(startDate.childNode(3).childNode(0));
-			System.out.println(startDate.childNode(3).childNode(0));
+			//System.out.println(startDate.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element venue = eventPage.select(VENUE).first();
 			//sb.append(venue.childNode(3).childNode(0));
-			System.out.println(venue.childNode(3).childNode(0));
+			//System.out.println(venue.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element address = eventPage.select(ADDRESS).first();
 			//sb.append(address.text());
 			//sb.append(address.childNode(3).childNode(0));
-			System.out.println(address.childNode(3).childNode(0));
+			//System.out.println(address.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element cost = eventPage.select(PRICE).first();
 			//sb.append(cost.text());
 			//sb.append(cost.childNode(3).childNode(0));
-			System.out.println(cost.childNode(3).childNode(0));
+			//System.out.println(cost.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element time = eventPage.select(TIME).first();
 			//sb.append(time.text());
-			//sb.append(time.childNode(3).childNode(0));
-			System.out.println(time.childNode(3).childNode(0));
+			sb.append(time.childNode(3).childNode(0));
+			//System.out.println(time.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element website = eventPage.select(WEBSITE).first();
 			//sb.append(website.select("a").get(0).attr("href"));
-			System.out.println(website.select("a").get(0).attr("href"));
+			//System.out.println(website.select("a").get(0).attr("href"));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element phone = eventPage.select(PHONE).first();
 			int index = phone.text().indexOf(":");
 			//sb.append(phone.text().substring(index + 2));
-			System.out.println(phone.text().substring(index + 2));
+			//System.out.println(phone.text().substring(index + 2));
 		} catch (NullPointerException e) {}
 
 		return sb;
