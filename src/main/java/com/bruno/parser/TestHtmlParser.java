@@ -45,7 +45,7 @@ public class TestHtmlParser {
 					Document eventPage = Jsoup.connect(link).get();
 
 					StringBuilder event = buildEvent(eventPage);
-					System.out.println(TimeHelper.extractTime(event.toString()));
+					System.out.println(event);
 
 					increments++;
 					
