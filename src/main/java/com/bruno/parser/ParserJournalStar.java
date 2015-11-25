@@ -20,16 +20,19 @@ public class ParserJournalStar {
 			
 			Elements links = events.select("a");
 			
-			System.out.println(links.size());
-			
 			String link = URL;
 			
 			for(int i = 0; i < links.size(); i++){
 				link += links.get(i).attr("href");
 				Document eventPage = Jsoup.connect(link).get();
 				
-				Elements title = eventPage.select("div.title-block");
-				Elements description = eventPage.select("div.asset-body");
+				Element titleDiv = eventPage.select("div.title-block").first();
+				System.out.println(titleDiv.childNodes().get(1).childNode(0));
+				
+				Element dateDiv = eventPage.select("div.event-date").first();
+				//System.out.println(titleDiv.childNodes().get(5).childNode(0));
+				
+				Elements descriptionDiv = eventPage.select("div.asset-body");
 				//Elements title = eventPage.select("div.title-block");
 				//Elements title = eventPage.select("div.title-block");
 				
