@@ -3,6 +3,8 @@ package com.bruno.parser;
 import java.io.IOException;
 
 
+import java.time.LocalDateTime;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,12 +24,14 @@ public class TestHtmlParser {
 	private static final String DESCRIPTION = "p.description";
 
 	public static void main(String[] args) {
-
+		
+		LocalDateTime date = LocalDateTime.now();
+		
 		try {
 			int increments = 0;
 			int total = 100;
 
-			Document html = Jsoup.connect("http://lincoln.org/?dstart=10%2F16%2F2015&os=" + increments + "&cat=&dend=10%2F31%2F2015&keyword=").get();
+			Document html = Jsoup.connect("http://lincoln.org/?dstart="+date.getMonthValue()+"%2F"+date.getDayOfMonth()+"%2F"+date.getYear()+"&os=" + increments + "&cat=&dend="+date.getMonthValue()+"%2F"+date.getDayOfYear()+"%2F"+date.getYear()+"&keyword=").get();
 
 			for (int i = 0; i < total; i++) {
 
@@ -51,7 +55,7 @@ public class TestHtmlParser {
 					
 				} else {
 					
-					html = Jsoup.connect("http://lincoln.org/?dstart=10%2F16%2F2015&os=" + i + "&cat=&dend=10%2F31%2F2015&keyword=").get();
+					html = Jsoup.connect("http://lincoln.org/?dstart="+date.getMonthValue()+"%2F"+date.getDayOfMonth()+"%2F"+date.getYear()+"&os=" + i + "&cat=&dend="+date.getMonthValue()+"%2F"+date.getDayOfYear()+"%2F"+date.getYear()+"&keyword=").get();
 					increments = 0;
 				}
 
@@ -69,38 +73,38 @@ public class TestHtmlParser {
 		try {
 			Element eventName = eventPage.select(EVENT_NAME).first();
 			//System.out.println(eventName.childNodes().get(0));
-			//sb.append(description.childNode(0));
+			sb.append(eventName.childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element description = eventPage.select(DESCRIPTION).first();
 			//System.out.println(description.childNode(0));
-			//sb.append(description.childNode(0));
+			sb.append(description.childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element startDate = eventPage.select(DATE).first();
-			//sb.append(startDate.childNode(3).childNode(0));
+			sb.append(startDate.childNode(3).childNode(0));
 			//System.out.println(startDate.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element venue = eventPage.select(VENUE).first();
-			//sb.append(venue.childNode(3).childNode(0));
+			sb.append(venue.childNode(3).childNode(0));
 			//System.out.println(venue.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element address = eventPage.select(ADDRESS).first();
 			//sb.append(address.text());
-			//sb.append(address.childNode(3).childNode(0));
+			sb.append(address.childNode(3).childNode(0));
 			//System.out.println(address.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element cost = eventPage.select(PRICE).first();
 			//sb.append(cost.text());
-			//sb.append(cost.childNode(3).childNode(0));
+			sb.append(cost.childNode(3).childNode(0));
 			//System.out.println(cost.childNode(3).childNode(0));
 		} catch (NullPointerException e) {}
 
@@ -113,14 +117,14 @@ public class TestHtmlParser {
 		
 		try {
 			Element website = eventPage.select(WEBSITE).first();
-			//sb.append(website.select("a").get(0).attr("href"));
+			sb.append(website.select("a").get(0).attr("href"));
 			//System.out.println(website.select("a").get(0).attr("href"));
 		} catch (NullPointerException e) {}
 
 		try {
 			Element phone = eventPage.select(PHONE).first();
 			int index = phone.text().indexOf(":");
-			//sb.append(phone.text().substring(index + 2));
+			sb.append(phone.text().substring(index + 2));
 			//System.out.println(phone.text().substring(index + 2));
 		} catch (NullPointerException e) {}
 
