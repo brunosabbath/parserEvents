@@ -1,4 +1,4 @@
-package com.bruno.model.old;
+package com.bruno.model;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

@@ -1,7 +1,10 @@
 package com.bruno.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import java.math.BigInteger;
 import java.util.List;
 
 
@@ -10,17 +13,18 @@ import java.util.List;
  * 
  */
 @Entity
-@NamedQuery(name="Venue.findAll", query="SELECT v FROM Venue v")
 public class Venue implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private int id;
+	@Id @GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
 
 	private String address;
 
 	@Column(name="address_complement")
 	private String addressComplement;
+
+	private String city;
 
 	private String description;
 
@@ -40,22 +44,18 @@ public class Venue implements Serializable {
 	@OneToMany(mappedBy="venue")
 	private List<Event> events;
 
-	//bi-directional many-to-one association to Hour
-	@OneToMany(mappedBy="venue")
-	private List<Hour> hours;
-
 	public Venue() {
 	}
-	
-	public Venue(String name){
-		this.name = name;
-	}
 
-	public int getId() {
+	public Venue(long id){
+		this.id = id;
+	}
+	
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -63,72 +63,90 @@ public class Venue implements Serializable {
 		return this.address;
 	}
 
-	public void setAddress(String address) {
+	public Venue setAddress(String address) {
 		this.address = address;
+		return this;
 	}
 
 	public String getAddressComplement() {
 		return this.addressComplement;
 	}
 
-	public void setAddressComplement(String addressComplement) {
+	public Venue setAddressComplement(String addressComplement) {
 		this.addressComplement = addressComplement;
+		return this;
+	}
+
+	public String getCity() {
+		return this.city;
+	}
+
+	public Venue setCity(String city) {
+		this.city = city;
+		return this;
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public Venue setDescription(String description) {
 		this.description = description;
+		return this;
 	}
 
 	public String getEmail() {
 		return this.email;
 	}
 
-	public void setEmail(String email) {
+	public Venue setEmail(String email) {
 		this.email = email;
+		return this;
 	}
 
 	public String getFacebook() {
 		return this.facebook;
 	}
 
-	public void setFacebook(String facebook) {
+	public Venue setFacebook(String facebook) {
 		this.facebook = facebook;
+		return this;
 	}
 
 	public String getName() {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public Venue setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public String getTelephone() {
 		return this.telephone;
 	}
 
-	public void setTelephone(String telephone) {
+	public Venue setTelephone(String telephone) {
 		this.telephone = telephone;
+		return this;
 	}
 
 	public String getTwitter() {
 		return this.twitter;
 	}
 
-	public void setTwitter(String twitter) {
+	public Venue setTwitter(String twitter) {
 		this.twitter = twitter;
+		return this;
 	}
 
 	public String getWebsite() {
 		return this.website;
 	}
 
-	public void setWebsite(String website) {
+	public Venue setWebsite(String website) {
 		this.website = website;
+		return this;
 	}
 
 	public List<Event> getEvents() {
@@ -151,28 +169,6 @@ public class Venue implements Serializable {
 		event.setVenue(null);
 
 		return event;
-	}
-
-	public List<Hour> getHours() {
-		return this.hours;
-	}
-
-	public void setHours(List<Hour> hours) {
-		this.hours = hours;
-	}
-
-	public Hour addHour(Hour hour) {
-		getHours().add(hour);
-		hour.setVenue(this);
-
-		return hour;
-	}
-
-	public Hour removeHour(Hour hour) {
-		getHours().remove(hour);
-		hour.setVenue(null);
-
-		return hour;
 	}
 
 }

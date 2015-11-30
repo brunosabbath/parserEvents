@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bruno.dao.VenueRepository;
 import com.bruno.model.Venue;
-import com.bruno.model.old.VenueMongo;
+import com.bruno.model.VenueMongo;
 
 @SpringBootApplication
 public class ParserEventsApplication implements CommandLineRunner{
@@ -41,6 +41,7 @@ public class ParserEventsApplication implements CommandLineRunner{
 			
 			venue.setTwitter(v.getTwitter());
 			venue.setWebsite(v.getWebsite());
+			venue.setCity("Lincoln, NE");
 			dao.save(venue);
 		}
 

@@ -20,21 +20,16 @@ public class Tag implements Serializable {
 	private String name;
 
 	//bi-directional many-to-many association to Event
-	@ManyToMany
-	@JoinTable(
-		name="tag_has_event"
-		, joinColumns={
-			@JoinColumn(name="tag_id")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="event_id")
-			}
-		)
+	@ManyToMany(mappedBy="tags")
 	private List<Event> events;
 
 	public Tag() {
 	}
 
+	public Tag(int id) {
+		this.id = id;
+	}
+	
 	public int getId() {
 		return this.id;
 	}
