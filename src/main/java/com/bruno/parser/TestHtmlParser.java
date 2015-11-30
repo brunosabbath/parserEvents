@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.Month;
 
+import java.time.LocalDateTime;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -161,6 +163,7 @@ public class TestHtmlParser {
 			//System.out.println(eventName.childNodes().get(0));
 			//sb.append(eventName.childNode(0));
 			event[Constant.EVENT_NAME] = eventName.childNode(0).toString();
+
 		} catch (NullPointerException e) {}
 		
 		try {
@@ -172,14 +175,12 @@ public class TestHtmlParser {
 		
 		try {
 			Element startDate = eventPage.select(DATE).first();
-			//sb.append(startDate.childNode(3).childNode(0));
 			//System.out.println(startDate.childNode(3).childNode(0));
 			event[Constant.EVENT_DATE] = startDate.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
 
 		try {
 			Element venue = eventPage.select(VENUE).first();
-			//sb.append(venue.childNode(3).childNode(0));
 			//System.out.println(venue.childNode(3).childNode(0));
 			event[Constant.EVENT_VENUE] = venue.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
@@ -206,18 +207,6 @@ public class TestHtmlParser {
 			event[Constant.EVENT_TIME] = time.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
 		
-		try {
-			//Element website = eventPage.select(WEBSITE).first();
-			//sb.append(website.select("a").get(0).attr("href"));
-			//System.out.println(website.select("a").get(0).attr("href"));
-		} catch (NullPointerException e) {}
-
-		try {
-			//Element phone = eventPage.select(PHONE).first();
-			//int index = phone.text().indexOf(":");
-			//sb.append(phone.text().substring(index + 2));
-			//System.out.println(phone.text().substring(index + 2));
-		} catch (NullPointerException e) {}
 
 		return event;
 	}

@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import scala.annotation.meta.getter;
+
 public class ParserJournalStar {
 
 	private static final String URL = "http://journalstar.com/calendar";
@@ -28,11 +30,14 @@ public class ParserJournalStar {
 				Element titleDiv = eventPage.select("div.title-block").first();
 				System.out.println(titleDiv.childNodes().get(1).childNode(0));
 				System.out.println(titleDiv.childNodes().get(5).childNode(0).toString().trim());
+
 				Element descriptionDiv = eventPage.select("div.event-description").first();
 				System.out.println(descriptionDiv.select("p").text());
-				
+
 				Element venueDiv = eventPage.select("div.venue").first();
 				System.out.println(venueDiv.select("div.title").text());
+	
+				//Elements description = eventPage.select("div.asset-body");
 				
 				//Elements description = eventPage.select("div.asset-body");
 				
