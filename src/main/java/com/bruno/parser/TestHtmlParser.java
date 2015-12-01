@@ -1,9 +1,9 @@
 package com.bruno.parser;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
-
 import java.time.LocalDateTime;
 
 import org.jsoup.Jsoup;
@@ -24,16 +24,15 @@ public class TestHtmlParser {
 	private static final String ADDRESS = "div.prop.location";
 	private static final String PRICE = "div.prop.cost";
 	private static final String TIME = "div.prop.time";
-	private static final String WEBSITE = "div.prop.website";
-	private static final String PHONE = "div.prop.phone";
 	private static final String DATE = "div.prop.display_date";
 	private static final String DESCRIPTION = "p.description";
 	private static final String YEAR = "div.date";
 	private static final int START_MONTH = 0;
 	private static final int END_MONTH = 3;
 	private static final int START_DAY = 1;
+	private static final int END_DAY = 4;
 	private static final int START_TIME = 0;
-	private static final int END_TIME = 2;
+	private static final int END_TIME = 1;
 
 	public static void main(String[] args) {
 		
@@ -64,7 +63,9 @@ public class TestHtmlParser {
 
 					//Event event = new Event();
 					
-					LocalDateTime start = getStartDate(events[Constant.EVENT_DATE], events[Constant.EVENT_TIME], events[Constant.EVENT_YEAR]);
+					Event event = new Event();
+					
+					getStartDate(event, events[Constant.EVENT_DATE], events[Constant.EVENT_TIME], events[Constant.EVENT_YEAR]);
 					
 					/*LocalDateTime start = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
 					LocalDateTime end = LocalDateTime.of(year, month, dayOfMonth, hour, minute);*/
@@ -84,33 +85,44 @@ public class TestHtmlParser {
 
 	}
 
-	private static LocalDateTime getStartDate(String date, String time, String year) {
+	private static void getStartDate(Event event, String date, String time, String year) {
 		String dateStr[] = date.split(" ");
-		String timeStr[] = time.split("-");
 		
 		int intYear = Integer.parseInt(year);
 		
-		Month month;
+		Month startMonth;
+		Month endMonth;
 		
-		month = getMonth(dateStr, START_MONTH);
-		//getMonth(dateStr, END_MONTH);
+		startMonth = getMonth(dateStr, START_MONTH);
+		endMonth = getMonth(dateStr, END_MONTH);
 		
-		LocalDateTime t;
+		LocalDateTime startDate, endDate;
 		
 		if(time.length() >= START_VALID_TIME && time.length() <= END_VALID_TIME){
-			int hour = getHour(time, START_TIME);
-			t = LocalDateTime.of(intYear, month, Integer.parseInt(dateStr[START_DAY]), hour, 0);
+			int startHour = getHour(time, START_TIME);
+			int endHour = getHour(time, END_TIME);
+			startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
+			endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), endHour, 0);
 		}
-		else	
-			t = LocalDateTime.of(intYear, month, Integer.parseInt(dateStr[START_DAY]), 0, 0);
-		return t;
+		else{
+			startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
+			endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), 0, 0);
+		}
+		
+		event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
+		
 	}
 
 	private static int getHour(String time, int index) {
 		
 		String strTime[] = time.split("-");
 		
-		return Integer.parseInt(strTime[index].substring(0, strTime[index].length()-REMOVE_AMPM));
+		int length = strTime[index].length();
+		
+		if(strTime[index].substring(length-REMOVE_AMPM, length).equalsIgnoreCase("am"))
+			return Integer.parseInt(strTime[index].substring(0, length-REMOVE_AMPM));
+		else 
+			return 12 + Integer.parseInt(strTime[index].substring(0, length-REMOVE_AMPM));
 		
 	}
 
