@@ -2,6 +2,7 @@ package com.bruno.model;
 
 import java.io.Serializable;
 
+
 import javax.persistence.*;
 
 import java.sql.Timestamp;
@@ -84,6 +85,11 @@ public class Event implements Serializable{
 
 	public Event setDescription(String description) {
 		this.description = description;
+		return this;
+	}
+	
+	public Event updateDescription(String description){
+		this.description += "\n" + description + "\n";
 		return this;
 	}
 

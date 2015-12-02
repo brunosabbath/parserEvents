@@ -33,6 +33,8 @@ public class TestHtmlParser {
 	private static final int END_DAY = 4;
 	private static final int START_TIME = 0;
 	private static final int END_TIME = 1;
+	private static final int ONE_DAY_EVENT = 2;
+	private static final int JUST_START_TIME = 4;
 
 	public static void main(String[] args) {
 		
@@ -59,13 +61,8 @@ public class TestHtmlParser {
 
 					Document eventPage = Jsoup.connect(link).get();
 
-					String events[] = buildEvent(eventPage);
+					Event event = buildEvent(eventPage);
 
-					//Event event = new Event();
-					
-					Event event = new Event();
-					
-					getStartDate(event, events[Constant.EVENT_DATE], events[Constant.EVENT_TIME], events[Constant.EVENT_YEAR]);
 					
 					/*LocalDateTime start = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
 					LocalDateTime end = LocalDateTime.of(year, month, dayOfMonth, hour, minute);*/
@@ -90,32 +87,90 @@ public class TestHtmlParser {
 		
 		int intYear = Integer.parseInt(year);
 		
-		Month startMonth;
-		Month endMonth;
-		
-		startMonth = getMonth(dateStr, START_MONTH);
-		endMonth = getMonth(dateStr, END_MONTH);
-		
-		LocalDateTime startDate, endDate;
-		
-		if(time.length() >= START_VALID_TIME && time.length() <= END_VALID_TIME){
-			int startHour = getHour(time, START_TIME);
-			int endHour = getHour(time, END_TIME);
-			startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
-			endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), endHour, 0);
+		if(hasOneDate(dateStr)){
+			
+			Month startMonth;
+			Month endMonth;
+			
+			startMonth = getMonth(dateStr, START_MONTH);
+			endMonth = startMonth;
+			
+			LocalDateTime startDate, endDate;
+			
+			if(hasStartAndEndTime(time)){
+				try {
+					int startHour = getHour(time, START_TIME);
+					int endHour = getHour(time, END_TIME);
+					startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
+					endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), endHour, 0);
+					event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
+				} catch (NumberFormatException e) {
+					System.out.println("deu merda");
+				}
+				
+			}
+			else if (hasStartTime(time)){
+				int startHour = getHour(time, START_TIME);
+				startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
+				endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
+				event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
+			}
+			else{
+				startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
+				endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
+				event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
+			}
+			
 		}
 		else{
-			startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
-			endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), 0, 0);
+			
+			Month startMonth;
+			Month endMonth;
+			
+			startMonth = getMonth(dateStr, START_MONTH);
+			endMonth = getMonth(dateStr, END_MONTH);
+			
+			LocalDateTime startDate, endDate;
+			
+			if(hasStartAndEndTime(time)){
+				int startHour = getHour(time, START_TIME);
+				int endHour = getHour(time, END_TIME);
+				startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
+				endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), endHour, 0);
+			}
+			else if(hasStartTime(time)){
+				int startHour = getHour(time, START_TIME);
+				startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), startHour, 0);
+				endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), 0, 0);
+			}
+			else{
+				startDate = LocalDateTime.of(intYear, startMonth, Integer.parseInt(dateStr[START_DAY]), 0, 0);
+				endDate = LocalDateTime.of(intYear, endMonth, Integer.parseInt(dateStr[END_DAY]), 0, 0);
+			}
+			
+			event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
 		}
-		
-		event.setStartDate(Timestamp.valueOf(startDate)).setEndDate(Timestamp.valueOf(endDate));
 		
 	}
 
-	private static int getHour(String time, int index) {
+	private static boolean hasOneDate(String[] dateStr) {
+		return dateStr.length == ONE_DAY_EVENT;
+	}
+
+	private static boolean hasStartAndEndTime(String time) {
+		return time.length() >= START_VALID_TIME && time.length() <= END_VALID_TIME;
+	}
+
+	private static boolean hasStartTime(String time) {
+		return time.length() <= JUST_START_TIME;
+	}
+	
+	private static int getHour(String time, int index) throws NumberFormatException {
 		
 		String strTime[] = time.split("-");
+		
+		if(hasOneDate(strTime))
+			index = 0;
 		
 		int length = strTime[index].length();
 		
@@ -129,6 +184,9 @@ public class TestHtmlParser {
 	private static Month getMonth(String[] dateStr, int index) {
 		
 		Month month;
+		
+		if(hasOneDate(dateStr))
+			index = 0;
 		
 		if(dateStr[index].equalsIgnoreCase("Jan"))
 			month = Month.JANUARY;
@@ -158,57 +216,62 @@ public class TestHtmlParser {
 		return month;
 	}
 
-	private static String[] buildEvent(Element eventPage) {
+	private static Event buildEvent(Element eventPage) {
 
 		//StringBuilder sb = new StringBuilder();
-		String event[] = new String[8];
+		String eventVet[] = new String[8];
+		
+		Event event = new Event();
 		
 		try {
 			Element year = eventPage.select(YEAR).first();
 			//System.out.println(eventName.childNodes().get(0));
 			//sb.append(eventName.childNode(0));
-			event[Constant.EVENT_YEAR] = year.childNodes().get(4).childNode(0).toString();
+			eventVet[Constant.EVENT_YEAR] = year.childNodes().get(4).childNode(0).toString();
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element eventName = eventPage.select(EVENT_NAME).first();
 			//System.out.println(eventName.childNodes().get(0));
 			//sb.append(eventName.childNode(0));
-			event[Constant.EVENT_NAME] = eventName.childNode(0).toString();
-
+			eventVet[Constant.EVENT_NAME] = eventName.childNode(0).toString();
+			event.setName(eventVet[Constant.EVENT_NAME]);
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element description = eventPage.select(DESCRIPTION).first();
 			//System.out.println(description.childNode(0));
 			//sb.append(description.childNode(0));
-			event[Constant.EVENT_DESCRIPTION] = description.childNode(0).toString(); 
+			eventVet[Constant.EVENT_DESCRIPTION] = description.childNode(0).toString(); 
+			event.setDescription(eventVet[Constant.EVENT_DESCRIPTION]);
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element startDate = eventPage.select(DATE).first();
 			//System.out.println(startDate.childNode(3).childNode(0));
-			event[Constant.EVENT_DATE] = startDate.childNode(3).childNode(0).toString();
+			eventVet[Constant.EVENT_DATE] = startDate.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
 
 		try {
 			Element venue = eventPage.select(VENUE).first();
 			//System.out.println(venue.childNode(3).childNode(0));
-			event[Constant.EVENT_VENUE] = venue.childNode(3).childNode(0).toString();
+			eventVet[Constant.EVENT_VENUE] = venue.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
 
 		try {
 			Element address = eventPage.select(ADDRESS).first();
 			//sb.append(address.text());
 			//sb.append(address.childNode(3).childNode(0));
-			event[Constant.EVENT_ADDRESS] = address.childNode(3).childNode(0).toString(); 
+			eventVet[Constant.EVENT_ADDRESS] = address.childNode(3).childNode(0).toString();
+			event.setAddress(eventVet[Constant.EVENT_ADDRESS]);
 		} catch (NullPointerException e) {}
 		
 		try {
 			Element cost = eventPage.select(PRICE).first();
 			//sb.append(cost.text());
 			//sb.append(cost.childNode(3).childNode(0));
-			event[Constant.EVENT_PRICE] = cost.childNode(3).childNode(0).toString(); 
+			eventVet[Constant.EVENT_PRICE] = cost.childNode(3).childNode(0).toString();
+			event.setPrice(eventVet[Constant.EVENT_PRICE]);
 		} catch (NullPointerException e) {}
 
 		try {
@@ -216,9 +279,10 @@ public class TestHtmlParser {
 			//sb.append(time.text());
 			//sb.append(time.childNode(3).childNode(0));
 			//System.out.println(time.childNode(3).childNode(0));
-			event[Constant.EVENT_TIME] = time.childNode(3).childNode(0).toString();
+			eventVet[Constant.EVENT_TIME] = time.childNode(3).childNode(0).toString();
 		} catch (NullPointerException e) {}
 		
+		getStartDate(event, eventVet[Constant.EVENT_DATE], eventVet[Constant.EVENT_TIME], eventVet[Constant.EVENT_YEAR]);
 
 		return event;
 	}
