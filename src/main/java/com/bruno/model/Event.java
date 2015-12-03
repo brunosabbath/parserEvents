@@ -56,6 +56,7 @@ public class Event implements Serializable{
 	private List<User> users;
 
 	public Event() {
+		description = "";
 	}
 
 	public Event(Long id) {
@@ -83,13 +84,13 @@ public class Event implements Serializable{
 		return this.description;
 	}
 
-	public Event setDescription(String description) {
+	/*public Event setDescription(String description) {
 		this.description = description;
 		return this;
-	}
+	}*/
 	
 	public Event updateDescription(String description){
-		this.description += "\n" + description + "\n";
+		this.description += "\n" + description;
 		return this;
 	}
 

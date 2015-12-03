@@ -24,7 +24,7 @@ public class ReadTest {
 		 System.out.println(message);
 		*/
 
-		URL url = new URL("http://journalstar.com/calendar/search/?f=rss&c=calendar*&d1=now&s=start_time&sd=asc&unrolled=1&l=25");
+		URL url = new URL("http://journalstar.com/calendar/search/?f=rss&c=calendar*&d1=now&s=start_time&sd=asc&unrolled=1&l=30");
 
 		XmlReader reader = null;
 
@@ -33,14 +33,17 @@ public class ReadTest {
 			reader = new XmlReader(url);
 			SyndFeed feed = new SyndFeedInput().build(reader);
 
+			int total = 0;
+			
 			for(Object obj : feed.getEntries()){
 				SyndEntry entry = (SyndEntry) obj;
 				String link = entry.getLink();
 				//System.out.println(link);
-				ParserJournalStar.buildEvent(link);
+				//ParserJournalStar.buildEvent(link);
+				total++;
 				System.out.println("----------------");
 			}
-			
+			System.out.println(total);
 		} finally {
 			if (reader != null)
 				reader.close();

@@ -243,7 +243,7 @@ public class TestHtmlParser {
 			//System.out.println(description.childNode(0));
 			//sb.append(description.childNode(0));
 			eventVet[Constant.EVENT_DESCRIPTION] = description.childNode(0).toString(); 
-			event.setDescription(eventVet[Constant.EVENT_DESCRIPTION]);
+			event.updateDescription(eventVet[Constant.EVENT_DESCRIPTION]);
 		} catch (NullPointerException e) {}
 		
 		try {

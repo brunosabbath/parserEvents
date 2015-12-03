@@ -4,9 +4,9 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-public class ParserUtils {
+import com.bruno.parser.Constant;
 
-	private static final int START_DATE = 0;
+public class ParserUtils {
 
 	private static int getDay(String date) {
 		String dateVet[] = date.trim().split(" ");
@@ -24,27 +24,27 @@ public class ParserUtils {
 		date = date.trim();
 		String monthStr = date.substring(0, 3);
 		
-		if(monthStr.equalsIgnoreCase("Jan"))
+		if(monthStr.contains("Jan"))
 			month = Month.JANUARY;
-		else if(monthStr.equalsIgnoreCase("Feb"))
+		else if(monthStr.contains("Feb"))
 			month = Month.FEBRUARY;
-		else if(monthStr.equalsIgnoreCase("Mar"))
+		else if(monthStr.contains("Mar"))
 			month = Month.MARCH;
-		else if(monthStr.equalsIgnoreCase("Apr"))
+		else if(monthStr.contains("Apr"))
 			month = Month.APRIL;
-		else if(monthStr.equalsIgnoreCase("May"))
+		else if(monthStr.contains("May"))
 			month = Month.MAY;
-		else if(monthStr.equalsIgnoreCase("Jun"))
+		else if(monthStr.contains("Jun"))
 			month = Month.JUNE;
-		else if(monthStr.equalsIgnoreCase("Jul"))
+		else if(monthStr.contains("Jul"))
 			month = Month.JULY;
-		else if(monthStr.equalsIgnoreCase("Aug"))
+		else if(monthStr.contains("Aug"))
 			month = Month.AUGUST;
-		else if(monthStr.equalsIgnoreCase("Sep"))
+		else if(monthStr.contains("Sep"))
 			month = Month.SEPTEMBER;
-		else if(monthStr.equalsIgnoreCase("Oct"))
+		else if(monthStr.contains("Oct"))
 			month = Month.OCTOBER;
-		else if(monthStr.equalsIgnoreCase("Nov"))
+		else if(monthStr.contains("Nov"))
 			month = Month.NOVEMBER;
 		else
 			month = Month.DECEMBER;
@@ -52,8 +52,8 @@ public class ParserUtils {
 		return month;
 	}
 	
-	public static Timestamp parseStartDate(String startDate, int startOrEnd) {
-		String date[] = startDate.split(",");
+	public static Timestamp parseDate(String sDate, int startOrEnd) {
+		String date[] = sDate.split(",");
 		Month month = null;
 		int length = date.length, hour=0, minute=0, year=0, day=0;
 		
@@ -63,19 +63,36 @@ public class ParserUtils {
 			year = getYear(date[length-2]);
 			day = getDay(date[length-2]);
 		}
+		else if(startOrEnd == Constant.END_DATE && sDate.contains("Repeats")){
+			day = getDayEndDate(date[length-2]);
+			month = getMonthEndDate(date[length-2]);
+			year = getYearEndDate(date[length-1]);
+		}
 		else{
 			month = getMonth(date[1]);
 			year = getYear(date[1]);
 			day = getDay(date[1]);
 			hour = getHour(date[length-1], startOrEnd);
 			minute = getMinute(date[length-1], startOrEnd);
-			//hour = getHour(date[length-1], 3);
-			//minute = getMinute(date[length-1], 3);
 		}
 		
 		LocalDateTime ldt = LocalDateTime.of(year, month, day, hour, minute);
 		
 		return Timestamp.valueOf(ldt);
+	}
+
+	private static Month getMonthEndDate(String string) {
+		String date[] = string.trim().split(" ");
+		return getMonth(date[0]);
+	}
+
+	private static int getDayEndDate(String string) {
+		String date[] = string.trim().split(" ");
+		return Integer.parseInt(date[1]);
+	}
+
+	private static int getYearEndDate(String string) {
+		return Integer.parseInt(string.trim());
 	}
 
 	private static int getMinute(String hourStr, int index) {
@@ -91,7 +108,12 @@ public class ParserUtils {
 		
 		if("pm".equals(hourVet[index+1])){
 			try {
-				return 12 + Integer.parseInt(hourVet[index].trim().substring(0,2));
+				int hour = 12 + Integer.parseInt(hourVet[index].trim().substring(0,2));
+				
+				if(hour == 24)
+					hour--;
+				
+				return hour;
 			} catch (NumberFormatException e) {
 				return 12 + Integer.parseInt(hourVet[index].trim().substring(0,1));
 			}

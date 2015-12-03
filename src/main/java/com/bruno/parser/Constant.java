@@ -10,5 +10,7 @@ public class Constant {
 	public static final int EVENT_PRICE = 5;
 	public static final int EVENT_TIME = 6;
 	public static final int EVENT_YEAR = 7;
+	public static final int START_DATE = 0;
+	public static final int END_DATE = 3;
 	
 }
