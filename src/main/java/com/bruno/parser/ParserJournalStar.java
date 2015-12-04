@@ -2,6 +2,9 @@ package com.bruno.parser;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -48,15 +51,31 @@ public class ParserJournalStar {
 			Element endEvent = eventPage.select("div.schedule").first();
 			String dateEnd = endEvent.childNodes().get(0).toString().trim();
 			
-			if(!dateEnd.isEmpty()){
+			if(hasEndTime(startDate) && hasEndDate(dateEnd)){
+				Timestamp date = ParserUtils.parseDate(dateEnd, Constant.END_DATE);
+				Timestamp time = ParserUtils.parseDate(startDate, Constant.END_DATE);
+				event.updateDescription(dateEnd);
+				event.setEndDate(buildDateWithDateAndTime(date,time));
+			}
+			else if(hasEndTime(startDate)){
+				event.setEndDate(ParserUtils.parseDate(startDate, Constant.END_DATE));
+			}
+			else if(hasEndDate(dateEnd)){
+				event.setEndDate(ParserUtils.parseDate(dateEnd, Constant.END_DATE));
+			}
+			else if(!hasEndTime(startDate)){
+				Timestamp time = ParserUtils.parseDate(startDate, Constant.START_DATE);
+				event.setEndDate(buildDateNoHourNoMinute(time));
+			}
+			
+			/*if(!dateEnd.isEmpty()){
 				System.out.println("DateEnd: " + dateEnd);
 				event.setEndDate(ParserUtils.parseDate(dateEnd, Constant.END_DATE));
 				event.updateDescription(dateEnd);
 			}
 			else if(startDate.length() > HAS_END_DATE){
-				
 				event.setEndDate(ParserUtils.parseDate(startDate, Constant.END_DATE));
-			}
+			}*/
 			
 			Element descriptionDiv = eventPage.select("div.event-description").first();
 			System.out.println("Description: " + descriptionDiv.select("p").text());
@@ -78,11 +97,6 @@ public class ParserJournalStar {
 			
 			venue.setName(venueName);
 			
-			if(name.contains("Wet")){
-				System.out.println("para aqui");
-			}
-			
-			
 			String address = "";
 			try {
 				address = venueDiv.childNodes().get(3).childNode(3).childNode(0).toString().trim();
@@ -92,14 +106,16 @@ public class ParserJournalStar {
 				venue.setAddress(address);
 			} catch (IndexOutOfBoundsException e) {}
 			
-			try {
-				address = venueDiv.childNodes().get(1).childNode(3).childNode(0).toString().trim();
-				System.out.println("Address: " + address);
-				event.setAddress(address);
-				venue.setAddress(address);
-			} catch (IndexOutOfBoundsException e) {
-				event.setAddress(venueName);
-				venue.setAddress(venueName);
+			if(address.isEmpty()){
+				try {
+					address = venueDiv.childNodes().get(1).childNode(3).childNode(0).toString().trim();
+					System.out.println("Address: " + address);
+					event.setAddress(address);
+					venue.setAddress(address);
+				} catch (IndexOutOfBoundsException e) {
+					event.setAddress(venueName);
+					venue.setAddress(venueName);
+				}
 			}
 			
 			
@@ -117,30 +133,57 @@ public class ParserJournalStar {
 				venue.setCity(city);
 			}
 			
-			
-			try {
-				
-				Venue dbVenue = venueRepo.findVenueByName(venueName);
-				
-				if(dbVenue != null){
-					Venue newVenue = new Venue();
-					newVenue.setId(dbVenue.getId());
-					event.setVenue(newVenue);
-				}
-				else{
-					venue = venueRepo.save(venue);
-					event.setVenue(venue);
-				}
-				
-				dao.save(event);
-			} catch (DataIntegrityViolationException  e) {
-				System.out.println("duplicated");
-			}
+			save(event, venue, venueName);
 			
 			
 		} catch (IOException e) {
 			System.out.println("deu merlim");
 			buildEvent(link);
 		}
+	}
+
+	private void save(Event event, Venue venue, String venueName) {
+		try {
+			
+			Venue dbVenue = venueRepo.findVenueByName(venueName);
+			
+			if(dbVenue != null){
+				Venue newVenue = new Venue();
+				newVenue.setId(dbVenue.getId());
+				event.setVenue(newVenue);
+			}
+			else{
+				venue = venueRepo.save(venue);
+				event.setVenue(venue);
+			}
+			
+			dao.save(event);
+		} catch (DataIntegrityViolationException  e) {
+			System.out.println("duplicated");
+		}
+	}
+
+	private Timestamp buildDateWithDateAndTime(Timestamp date, Timestamp time) {
+		
+		LocalDateTime ldtDate = date.toLocalDateTime();
+		LocalDateTime ldtTime = time.toLocalDateTime();
+		
+		return Timestamp.valueOf(LocalDateTime.of(ldtDate.toLocalDate(), ldtTime.toLocalTime()));
+	}
+
+	private Timestamp buildDateNoHourNoMinute(Timestamp time) {
+		LocalDateTime original = time.toLocalDateTime();
+		
+		LocalTime newTime = LocalTime.of(0, 0);
+		
+		return Timestamp.valueOf(LocalDateTime.of(original.toLocalDate(), newTime));
+	}
+
+	private boolean hasEndDate(String dateEnd) {
+		return !dateEnd.isEmpty();
+	}
+
+	private boolean hasEndTime(String startDate) {
+		return startDate.length() > HAS_END_DATE;
 	}
 }

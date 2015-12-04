@@ -23,7 +23,8 @@ public class ReadTest {
 		for (FeedMessage message : feed.getMessages())
 		 System.out.println(message);
 		*/
-
+		
+		/*
 		URL url = new URL("http://journalstar.com/calendar/search/?f=rss&c=calendar*&d1=now&s=start_time&sd=asc&unrolled=1&l=30");
 
 		XmlReader reader = null;
@@ -47,7 +48,7 @@ public class ReadTest {
 		} finally {
 			if (reader != null)
 				reader.close();
-		}
+		}*/
 
 	}
 }
