@@ -89,6 +89,11 @@ public class Event implements Serializable{
 		return this;
 	}*/
 	
+	public Event setDescription(String description){
+		this.description = description;
+		return this;
+	}
+	
 	public Event updateDescription(String description){
 		this.description += "\n" + description;
 		return this;

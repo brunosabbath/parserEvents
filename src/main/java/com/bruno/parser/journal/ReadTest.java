@@ -1,14 +1,8 @@
-package com.bruno.parser;
+package com.bruno.parser.journal;
 
 import java.io.IOException;
 
-import java.net.URL;
-
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 public class ReadTest {
 	public static void main(String[] args) throws IOException,

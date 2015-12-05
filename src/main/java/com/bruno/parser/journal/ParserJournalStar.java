@@ -1,7 +1,7 @@
-package com.bruno.parser;
+package com.bruno.parser.journal;
 
 import java.io.IOException;
-import java.sql.SQLException;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,6 +15,7 @@ import com.bruno.dao.EventRepository;
 import com.bruno.dao.VenueRepository;
 import com.bruno.model.Event;
 import com.bruno.model.Venue;
+import com.bruno.parser.Constant;
 import com.bruno.utils.ParserUtils;
 
 public class ParserJournalStar {

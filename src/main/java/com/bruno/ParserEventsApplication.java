@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.TestRestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import com.bruno.dao.EventRepository;
 import com.bruno.dao.VenueRepository;
-import com.bruno.parser.ParserJournalStar;
+import com.bruno.model.Venue;
+import com.bruno.model.VenueMongo;
+import com.bruno.parser.journal.ParserJournalStar;
+import com.bruno.parser.unl.UnlParser;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -19,7 +24,7 @@ import com.sun.syndication.io.XmlReader;
 public class ParserEventsApplication implements CommandLineRunner{
 
 	@Autowired
-	private EventRepository dao;
+	private EventRepository eventRepo;
 	@Autowired
 	private VenueRepository venueRepo;
 	
@@ -30,7 +35,23 @@ public class ParserEventsApplication implements CommandLineRunner{
 	@Override
 	public void run(String... arg0) throws Exception {
 		
-		/*RestTemplate template = new TestRestTemplate();
+		
+		//getVenuesFromServer();
+		//journalParser();
+		unlParser();
+
+	}
+
+	private void unlParser() {
+		
+		String url = "https://events.unl.edu/upcoming/?format=json&limit=100";
+		UnlParser parser = new UnlParser(eventRepo, venueRepo, url);
+		parser.parse();
+		
+	}
+
+	public void getVenuesFromServer(){
+		RestTemplate template = new TestRestTemplate();
 		VenueMongo[] venueList = template.getForEntity("http://eventslnk.elasticbeanstalk.com/venue", VenueMongo[].class).getBody();
 		
 		for(VenueMongo v : venueList){
@@ -47,9 +68,11 @@ public class ParserEventsApplication implements CommandLineRunner{
 			venue.setTwitter(v.getTwitter());
 			venue.setWebsite(v.getWebsite());
 			venue.setCity("Lincoln, NE");
-			dao.save(venue);
-		}*/
-		
+			venueRepo.save(venue);
+		}
+	}
+	
+	private void journalParser() throws Exception{
 		URL url = new URL("http://journalstar.com/calendar/search/?f=rss&c=calendar*&d1=now&s=start_time&sd=asc&unrolled=1&l=30");
 
 		XmlReader reader = null;
@@ -61,7 +84,7 @@ public class ParserEventsApplication implements CommandLineRunner{
 
 			int total = 0;
 			
-			ParserJournalStar parser = new ParserJournalStar(dao,venueRepo);
+			ParserJournalStar parser = new ParserJournalStar(eventRepo,venueRepo);
 			
 			for(Object obj : feed.getEntries()){
 				SyndEntry entry = (SyndEntry) obj;
@@ -77,6 +100,6 @@ public class ParserEventsApplication implements CommandLineRunner{
 			if (reader != null)
 				reader.close();
 		}
-
+		
 	}
 }
