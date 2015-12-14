@@ -18,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import com.bruno.dao.EventRepository;
 import com.bruno.dao.VenueRepository;
 import com.bruno.model.Event;
+import com.bruno.model.User;
 import com.bruno.model.Venue;
 
 public class UnlParser {
@@ -30,6 +31,7 @@ public class UnlParser {
 	private String url;
 	private static final int EVENT_VENUE = 0;
 	private static final String EVENT_TYPE_NAME = "EventTypeName";
+	private static final Long OWNER_ID = (long) 1;
 
 	public UnlParser(EventRepository eventRepo, VenueRepository venueRepo, String url){
 		this.eventRepo = eventRepo;
@@ -71,8 +73,11 @@ public class UnlParser {
 					String startStr = (String) dateTime.get("Start");
 					String endStr = (String) dateTime.get("End");
 
+					User user = new User();
+					user.setId(OWNER_ID);
+					
 					event.setStartDate(getCorrectDate(startStr)).setEndDate(getCorrectDate(endStr)).setAddress(venueName)
-					.setDescription(description).setName(eventName);
+					.setDescription(description).setName(eventName).setOwner(user);
 					
 					venue.setName(venueName).setAddress(venueName).setCity(city);
 					
@@ -105,8 +110,16 @@ public class UnlParser {
 				venue = venueRepo.save(venue);
 			}
 			
-			event.setVenue(venue);
-			eventRepo.save(event);
+			Event oldEvent = eventRepo.findEventByNameAndStartDateAndEndDate(event.getName(), event.getStartDate(), event.getEndDate());
+			
+			if(oldEvent == null){
+				event.setVenue(venue);
+				eventRepo.save(event);
+			}
+			else{
+				System.out.println("duplicated: " + event.getName());
+			}
+			
 			
 		} catch (DataIntegrityViolationException e) {
 			System.out.println("duplicated: " + event.getName());
@@ -131,11 +144,18 @@ public class UnlParser {
 	}
 
 	private boolean eventHasValidType(JSONArray eventTypeJson) {
-		JSONObject eventType = (JSONObject) eventTypeJson.get(0);
-		String type = (String) eventType.get(EVENT_TYPE_NAME);
 		
-		if(type.contains("Arts") || type.contains("Activity") || type.contains("Social"))
-			return true;
+		
+		try {
+			JSONObject eventType = (JSONObject) eventTypeJson.get(0);
+			String type = (String) eventType.get(EVENT_TYPE_NAME);
+			
+			if(type.contains("Arts") || type.contains("Activity") || type.contains("Social"))
+				return true;
+		} catch (NullPointerException e) {
+			return false;
+		}
+		
 		
 		return false;
 	}

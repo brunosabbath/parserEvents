@@ -1,7 +1,6 @@
 package com.bruno.parser.journal;
 
 import java.io.IOException;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import com.bruno.dao.EventRepository;
 import com.bruno.dao.VenueRepository;
 import com.bruno.model.Event;
+import com.bruno.model.User;
 import com.bruno.model.Venue;
 import com.bruno.parser.Constant;
 import com.bruno.utils.ParserUtils;
@@ -21,11 +21,12 @@ import com.bruno.utils.ParserUtils;
 public class ParserJournalStar {
 	
 	private static final int HAS_END_DATE = 30;
-	private EventRepository dao;
+	private static final Long OWNER_ID = (long) 1;
+	private EventRepository eventRepo;
 	private VenueRepository venueRepo;
 
 	public ParserJournalStar(EventRepository dao, VenueRepository venueRepo) {
-		this.dao = dao;
+		this.eventRepo = dao;
 		this.venueRepo = venueRepo;
 	}
 
@@ -134,6 +135,11 @@ public class ParserJournalStar {
 				venue.setCity(city);
 			}
 			
+			User owner = new User();
+			owner.setId(OWNER_ID);
+			
+			event.setOwner(owner);
+			
 			save(event, venue, venueName);
 			
 			
@@ -158,9 +164,18 @@ public class ParserJournalStar {
 				event.setVenue(venue);
 			}
 			
-			dao.save(event);
+			Event oldEvent = eventRepo.findEventByNameAndStartDateAndEndDate(event.getName(), event.getStartDate(), event.getEndDate());
+			
+			if(oldEvent == null){
+				eventRepo.save(event);
+			}
+			else{
+				System.out.println("duplicated: " + event.getName());
+			}
+			
+			
 		} catch (DataIntegrityViolationException  e) {
-			System.out.println("duplicated");
+			System.out.println("duplicated: " + event.getName());
 		}
 	}
 

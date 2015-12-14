@@ -38,6 +38,9 @@ public class Event implements Serializable{
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Venue venue;
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	private User owner;
+	
 	//bi-directional many-to-many association to Tag
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -73,6 +76,14 @@ public class Event implements Serializable{
 
 	public String getAddress() {
 		return this.address;
+	}
+
+	public User getOwner() {
+		return owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	public Event setAddress(String address) {

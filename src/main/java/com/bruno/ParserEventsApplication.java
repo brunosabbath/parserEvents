@@ -37,8 +37,8 @@ public class ParserEventsApplication implements CommandLineRunner{
 		
 		
 		//getVenuesFromServer();
-		//journalParser();
-		unlParser();
+		journalParser();
+		//unlParser();
 
 	}
 

@@ -36,6 +36,21 @@ public class User implements Serializable {
 		)
 	private List<Event> events;
 
+	@OneToMany(mappedBy="owner")
+	private List<Event> eventsIOwn;
+	
+	public void addEventIOwn(Event event){
+		this.events.add(event);
+	}
+	
+	public List<Event> getEventsIOwn() {
+		return eventsIOwn;
+	}
+
+	public void setEventsIOwn(List<Event> eventsIOwn) {
+		this.eventsIOwn = eventsIOwn;
+	}
+
 	public User() {
 	}
 	
@@ -47,9 +62,9 @@ public class User implements Serializable {
 		return this.id;
 	}
 
-	/*public void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
-	}*/
+	}
 
 	public String getEmail() {
 		return this.email;
